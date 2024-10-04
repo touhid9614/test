@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="js/bootstrap.js "></script>
+	<script src="js/jquery.dataTables.min.js"></script>
+	<script src="js/dataTables.bootstrap4.min.js"></script>
+
+	<script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.flash.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+	<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js"></script>
+
+
+	<title>Home</title>
+	<style>
+		.container {
+			max-width: 1200px;
+			margin-top: 50px;
+			background-color: rgba(255, 255, 255, 0.8);
+			padding: 20px;
+			border-radius: 10px;
+		}
+
+		table {
+			width: 100%;
+		}
+
+		.add-row {
+			display: none;
+			/* Hide the row by default */
+		}
+
+		body {
+
+
+			font-family: "Helvetica Neue", "Lucida Grande", "Segoe UI", Arial, Helvetica, Verdana, sans-serif;
+			margin: 0px;
+			padding: 0px;
+
+			background-image: url('/images/logo_pattern.png');
+			/* Path to your PNG image */
+			background-size: cover;
+			/* Make the background cover the entire page */
+			background-position: center;
+			/* Center the image */
+			background-repeat: no-repeat;
+			/* Do not repeat the image */
+			height: 100vh;
+			/* Ensure the body takes the full height of the viewport */
+			padding-top: 10px;
+			padding-bottom: 100px;
+			background-attachment: fixed;
+
+		}
+
+		.btn-blue {
+			color: #fff;
+			background-color: #007bff;
+			border-color: #007bff;
+			/* Text color */
+		}
+
+		.logo {
+			display: block;
+
+			margin-bottom: 20px;
+		}
+	</style>
+</head>
+
+<body class="bg-light">
+	<div class="container">
+		<div class="d-flex justify-content-between mb-5 align-items-center">
+			<img src="/images/notify_logo.png" alt="Company Logo" class="logo">
+
+			<a href="/logout" class="btn btn-primary d-flex align-items-center">
+				<i class="bi bi-box-arrow-right mr-2"></i> <!-- Right sign-out icon -->
+				Log out
+			</a>
+		</div>
+
+		<h2 class="text-center">User Management</h2>
+
+		<!-- Add new user button -->
+		<div class="d-flex justify-content-between mb-5">
+			<button id="addUserButton" class="btn btn-blue">Add New User</button>
+
+		</div>
+		<!-- User List Table -->
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Username</th>
+					<th>Password</th> <!-- New Password Column -->
+					<th>Role</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- Existing users -->
+				<tr th:each="user : ${users}">
+					<td th:text="${user.id}" class="user-id"></td>
+					<td>
+						<input type="text" th:value="${user.username}" class="form-control username" readonly />
+					</td>
+					<td>*****</td> <!-- Masked password for existing users -->
+					<td>
+						<!--<input type="text" th:value="${user.role}" class="form-control role" readonly />-->
+						<select class="form-control role" readonly>
+							<option value="admin" th:selected="${user.role == 'admin'}">Admin</option>
+							<option value="user" th:selected="${user.role == 'user'}">User</option>
+							<option value="super-admin" th:selected="${user.role == 'super-admin'}">Super Admin</option>
+						</select>
+					</td>
+					<td>
+						<ul class="list-inline m-0">
+
+							<li class="list-inline-item">
+								<button class="btn btn-warning btn-sm rounded-0 edit-button" type="button"
+									data-toggle="tooltip" data-placement="top" title="Edit"><i
+										class="fa fa-edit"></i></button>
+							</li>
+							<li class="list-inline-item">
+								<button class="btn btn-success btn-sm rounded-0 save-button d-none" type="button"
+									data-toggle="tooltip" data-placement="top" title="Save"><i
+										class="fa fa-save"></i></button>
+							</li>
+							<li class="list-inline-item">
+								<a th:href="@{/deleteUser/{id}(id=${user.id})}" class="btn btn-danger btn-sm rounded-0"
+									type="button" data-toggle="tooltip" data-placement="top" title="Delete"><i
+										class="fa fa-trash"></i></a>
+							</li>
+						</ul>
+					</td>
+				</tr>
+
+				<!-- Row for adding a new user -->
+				<tr class="add-row">
+					<td></td>
+					<td><input type="text" id="usernameInput" class="form-control" placeholder="Enter username"></td>
+					<td><input type="password" id="passwordInput" class="form-control" placeholder="Enter password">
+					</td> <!-- Password Input -->
+					<td>
+						<select class="form-control role" id="roleInput" readonly>
+							<option value="admin" selected>Admin</option>
+							<option value="user">User</option>
+							<option value="super-admin">Super Admin</option>
+						</select>
+						<!--<input type="text" id="roleInput" class="form-control" placeholder="Enter role">-->
+					</td>
+					<td>
+						<ul class="list-inline m-0">
+							<li class="list-inline-item">
+								<button id="saveUserButton" class="btn btn-primary btn-sm rounded-0" type="button"
+									data-toggle="tooltip" data-placement="top" title="Add">
+									<i class="fa fa-plus"></i> <!-- Changed icon for clarity -->
+								</button>
+							</li>
+							<li class="list-inline-item">
+								<button id="cancelButton" class="btn btn-secondary btn-sm rounded-0"
+									data-toggle="tooltip" data-placement="top" title="Cancel">
+									<i class="fa fa-trash"></i> <!-- Trash icon -->
+							</li>
+							</button>
+						</ul>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script>
+		// Show the add user row when the add button is clicked
+		$('#addUserButton').click(function () {
+			$('.add-row').show(); // Show the input row
+		});
+
+		// Cancel button hides the input row
+		$('#cancelButton').click(function () {
+			$('.add-row').hide(); // Hide the input row
+			$('#usernameInput').val(''); // Clear input fields
+			$('#passwordInput').val(''); // Clear password field
+			$('#roleInput').val('');
+		});
+
+		// Save the new user via a POST request when the save button is clicked
+		$('#saveUserButton').click(function () {
+			const username = $('#usernameInput').val();
+			const password = $('#passwordInput').val(); // Get password value
+			const role = $('#roleInput').val();
+
+			if (username && password && role) {
+				// Make an AJAX POST request to save the user
+				$.ajax({
+					url: '/saveUser',
+					type: 'POST',
+					contentType: 'application/json',
+					data: JSON.stringify({
+						username: username,
+						password: password, // Send password to the server
+						role: role,
+						enabled: true
+					}),
+					success: function () {
+						// Reload the page after the user is successfully saved
+						location.reload();
+					},
+					error: function () {
+						alert('Failed to save user. Please try again.');
+					}
+				});
+			} else {
+				alert('Please fill out all fields.');
+			}
+		});
+
+		$(function () {
+			$('[data-toggle="tooltip"]').tooltip();
+		});
+
+		// Edit button functionality
+		$(document).on('click', '.edit-button', function () {
+			const row = $(this).closest('tr'); // Get the current row
+			row.find('.username').prop('readonly', false); // Enable editing on the username field
+			row.find('.role').prop('readonly', false); // Enable editing on the role field
+
+			$(this).addClass('d-none'); // Hide the edit button
+			row.find('.save-button').removeClass('d-none'); // Show the save button
+		});
+
+		// Save button functionality
+		$(document).on('click', '.save-button', function () {
+			const row = $(this).closest('tr'); // Get the current row
+			const userId = row.find('.user-id').text().trim(); // Get the user ID
+			const username = row.find('.username').val().trim(); // Get the username
+			const role = row.find('.role').val().trim(); // Get the role
+
+			// Make an AJAX PUT request to save the user
+			$.ajax({
+				url: '/editUser',
+				type: 'PUT',
+				contentType: 'application/json',
+				data: JSON.stringify({
+					id: userId,
+					username: username,
+					role: role,
+					enabled: true
+				}),
+				success: function () {
+					// Reload the page after the user is successfully saved
+					location.reload();
+				},
+				error: function () {
+					alert('Failed to update user. Please try again.');
+				}
+			});
+
+			// Disable editing after saving
+			row.find('.username').prop('readonly', true);
+			row.find('.role').prop('readonly', true);
+			$(this).addClass('d-none'); // Hide the save button
+			row.find('.edit-button').removeClass('d-none'); // Show the edit button again
+		});
+
+	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+/* DEFAULTS
+----------------------------------------------------------*/
+
+body   
+{
+
+
+    font-family: "Helvetica Neue", "Lucida Grande", "Segoe UI", Arial, Helvetica, Verdana, sans-serif;
+    margin: 0px;
+    padding: 0px;
+    
+    background-image: url('/images/logo_pattern.png'); /* Path to your PNG image */
+            background-size: cover; /* Make the background cover the entire page */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            height: 100vh; /* Ensure the body takes the full height of the viewport */
+            padding-top: 100px; 
+
+}
